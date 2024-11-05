@@ -1,5 +1,5 @@
 import "dotenv/config";
-import { Client } from "./constructor.js";
+import { Client } from "@constructor";
 
 const client = new Client();
 client.start();
