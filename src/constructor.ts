@@ -2,13 +2,30 @@ import {
     ApplicationCommandDataResolvable,
     Client as DiscordClient,
     ClientEvents,
-    Collection
+    Collection,
+    ApplicationCommandOptionType,
+    CommandInteraction
 } from "discord.js";
 import glob from "glob";
 
+/**
+ * @extends ClientEvents
+ */
 export class Event<K extends keyof ClientEvents> {
     constructor(public name: K, public run: (client: Client, ...args: ClientEvents[K]) => any) {};
 };
+
+/**
+ * @extends ApplicationCommandDataResolvable
+ */
+export class Command {
+    constructor(public data: ApplicationCommandDataResolvable & { run: (client: Client, interaction: CommandInteraction) => any }) {};
+}
+
+/**
+ * @extends ApplicationCommandOptionType
+ */
+export const CommandData = ApplicationCommandOptionType;
 
 /**
  * @extends DiscordClient
