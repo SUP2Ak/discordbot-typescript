@@ -1,0 +1,36 @@
+{
+  "name": "discordbot-typescript",
+  "author": "Rémi",
+  "license": "GNU GPLv3",
+  "version": "1.0.0",
+  "description": "Bot Discord TypeScript Template with MySQL",
+  "main": "index.js",
+  "scripts": {
+    "start": "ts-node src/index.ts",
+    "start:dev": "ts-node-dev src/index.ts",
+    "start:prod": "node dist/index.js",
+    "copy-assets": "cpx 'assets/**/*' dist/assets",
+    "build": "tsc && pnpm copy-assets"
+  },
+  "keywords": [
+    "discord",
+    "bot",
+    "typescript",
+    "template",
+    "mysql"
+  ],
+  "devDependencies": {
+    "@types/glob": "^8.1.0",
+    "@types/node": "^22.9.0",
+    "cpx": "^1.5.0",
+    "ts-node": "^10.9.2",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.6.3"
+  },
+  "dependencies": {
+    "discord.js": "^14.16.3",
+    "dotenv": "^16.4.5",
+    "glob": "^11.0.0",
+    "mysql2": "^3.11.4"
+  }
+}
