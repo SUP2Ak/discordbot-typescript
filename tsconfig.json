@@ -9,7 +9,16 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
-    "moduleResolution": "node"
+    "moduleResolution": "node",
+    "baseUrl": "./",
+    "paths": {
+      "@constructor": ["./src/constructor.ts"],
+      "@events": ["./src/events/*"],
+      "@commands": ["./src/commands/*"],
+      "@types": ["./src/typings/*"],
+      "@utils": ["./src/utils/*"],
+      "@handlers": ["./src/handlers/*"]
+    }
   },
   "include": ["src", "assets/**/*.json"],
   "exclude": ["node_modules", "dist"]
