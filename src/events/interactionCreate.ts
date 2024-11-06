@@ -1,7 +1,7 @@
 import { CommandInteractionOptionResolver } from "discord.js";
 import { Event } from "../constructor";
 import client  from "../index";
-import { Interaction } from "@/typings";
+import { Interaction } from "../typings";
 
 export default new Event("interactionCreate", async (interaction: any) => {
     if (interaction.isCommand()) {
