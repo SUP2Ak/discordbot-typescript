@@ -18,14 +18,6 @@
     "skipDefaultLibCheck": true,
     "resolveJsonModule": true,
     "importHelpers": true,
-    "paths": {
-      "@/constructor": ["./src/constructor"],
-      "@/events": ["./src/events/*"],
-      "@/commands": ["./src/commands/*"],
-      "@/typings": ["./src/typings/index"],
-      "@/utils": ["./src/utils/*"],
-      "@/handlers": ["./src/handlers/*"],
-    }
   },
   "include": ["src", "assets/**/*.json"],
   "exclude": ["node_modules", "dist"]
