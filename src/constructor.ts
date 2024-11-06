@@ -4,7 +4,7 @@ import {
     ClientEvents,
     Collection,
 } from "discord.js";
-import { RegisterCommandsOptions, CommandType } from "@/typings";
+import { RegisterCommandsOptions, CommandType } from "./typings";
 import { glob } from "glob";
 import path from "path";
 
