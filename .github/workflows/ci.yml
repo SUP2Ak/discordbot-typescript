@@ -66,4 +66,4 @@ jobs:
           DISCORD_TOKEN: ${{ secrets.DISCORD_TOKEN }}
           USE_SQL: 'false'
         run: |
-          pnpm start:prod
+          pnpm start:prod --ignore commands
