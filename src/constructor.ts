@@ -3,42 +3,45 @@ import {
     Client as DiscordClient,
     ClientEvents,
     Collection,
-    ApplicationCommandOptionType,
-    CommandInteraction
 } from "discord.js";
-import glob from "glob";
+import { RegisterCommandsOptions, CommandType } from "@/typings";
+import { glob } from "glob";
+import path from "path";
 
 /**
  * @extends ClientEvents
  */
 export class Event<K extends keyof ClientEvents> {
-    constructor(public name: K, public run: (client: Client, ...args: ClientEvents[K]) => any) {};
+    constructor(public name: K, public run: (...args: ClientEvents[K]) => any) { };
 };
 
 /**
  * @extends ApplicationCommandDataResolvable
  */
 export class Command {
-    constructor(public data: ApplicationCommandDataResolvable & { run: (client: Client, interaction: CommandInteraction) => any }) {};
+    constructor(commandOptions: CommandType) {
+        Object.assign(this, commandOptions);
+    }
 }
-
-/**
- * @extends ApplicationCommandOptionType
- */
-export const CommandData = ApplicationCommandOptionType;
 
 /**
  * @extends DiscordClient
  */
 export class Client extends DiscordClient {
-    commands: Collection<string, ApplicationCommandDataResolvable> = new Collection();
+    commands: Collection<string, CommandType> = new Collection();
 
     constructor() {
         super({ intents: 1 });
+        console.log('Client created!');
     };
 
     start() {
-        this.login(process.env.DISCORD_TOKEN);
+        this.registerModules();
+        this.login(process.env.DISCORD_TOKEN).then(() => {
+            console.log('Bot logged in!');
+        }).catch((err) => {
+            console.error(err);
+        });
     };
 
     /**
@@ -47,15 +50,19 @@ export class Client extends DiscordClient {
      * @returns {Promise<any>} The imported file
      */
     async importFile(filePath: string) {
-        return (await import(filePath))?.default;
-    };
+        console.log(filePath, 'relative path');
+        const fullPath = `.\\${filePath}`; //path.join(__dirname, filePath); // Construit le chemin complet
+        console.log(`Trying to import file: ${fullPath}`);
+        return (await import(fullPath))?.default;
+    }
 
     /**
      * Register commands to the bot
      * @param {ApplicationCommandDataResolvable[]} commands - The commands to register
      * @param {string} [guildId] - The guild ID to register the commands to
      */
-    async registerCommands({ commands, guildId }: { commands: ApplicationCommandDataResolvable[], guildId?: string }) {
+    async registerCommands({ commands, guildId }: RegisterCommandsOptions) {
+        console.log('Registering commands...');
         if (guildId) {
             this.guilds.cache.get(guildId)?.commands.set(commands);
             console.log(`Registered ${commands.length} commands to the guild ${guildId}.`);
@@ -70,9 +77,12 @@ export class Client extends DiscordClient {
      */
     async registerModules() {
         const slashCommands: ApplicationCommandDataResolvable[] = [];
-        const commandFiles = glob.sync(`${__dirname}/commands/**/*{.ts,.js}`);
-        commandFiles.map(async (filePath) => {
-            const command = await this.importFile(filePath);
+        console.log('Registering commands...');
+        const commandFiles = await glob(`${__dirname}/commands/*/*{.ts,.js}`) as string[];
+        console.log(commandFiles)
+        commandFiles.map(async (filePath: string) => {
+            const command = await this.importFile(path.relative(__dirname, filePath)); // Utilisez le chemin relatif
+            console.log(command.name, 'asd');
             if (!command.name) {
                 console.warn(`This command has no name: ${filePath}!`);
             } else {
@@ -83,21 +93,23 @@ export class Client extends DiscordClient {
         });
 
         this.on("ready", () => {
-            this.registerCommands({ 
+            console.log('Bot is ready!');
+            this.registerCommands({
                 commands: slashCommands,
                 guildId: process.env.DISCORD_GUILD_ID
             });
+            console.log('Commands registered!');
         });
 
         // Register events
-        const eventFiles = glob.sync(`${__dirname}/events/**/*{.ts,.js}`);
-        eventFiles.map(async (filePath) => {
-            const event: Event<keyof ClientEvents> = await this.importFile(filePath);
+        const eventFiles = await glob(`${__dirname}/events/**/*.{ts,js}`) as string[];
+        eventFiles.map(async (filePath: string) => {
+            const event: Event<keyof ClientEvents> = await this.importFile(path.relative(__dirname, filePath));
             if (!event.name || typeof event.run !== 'function') {
                 console.warn(`${!event.name ? 'This event has no name' : 'This event has no run function, type was ['} ${typeof event.run}] in ${filePath}!`);
             } else {
                 console.log(`Event: ${event.name} was successfully imported.`);
-                this.on(event.name, (...args) => event.run(this, ...args));
+                this.on(event.name, event.run);
             };
         });
     };
