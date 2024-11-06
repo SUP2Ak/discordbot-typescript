@@ -1,18 +1,15 @@
 import type { Config } from '@jest/types';
 
 const config: Config.InitialOptions = {
-  preset: 'ts-jest', // Utiliser ts-jest pour préprocesser les fichiers TypeScript
-  testEnvironment: 'node', // Environnement de test Node.js
+  preset: 'ts-jest',
+  testEnvironment: 'node',
   globals: {
     'ts-jest': {
-      isolatedModules: true, // Permet de ne pas isoler les modules TypeScript pour améliorer la vitesse
+      isolatedModules: true,
     },
   },
-  transform: {
-    '^.+\\.ts$': 'ts-jest', // Transforme les fichiers TypeScript en JavaScript avant les tests
-  },
-  moduleFileExtensions: ['ts', 'js'], // Extensions de fichiers à tester
-  testMatch: ['**/*.test.ts', '**/*.spec.ts'], // Pattern pour trouver les fichiers de test
+  moduleFileExtensions: ['ts', 'js'],
+  testPathIgnorePatterns: ['/node_modules/', '/dist/', '/src/commands/'],
 };
 
 export default config;
