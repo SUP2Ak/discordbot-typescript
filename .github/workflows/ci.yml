@@ -1,0 +1,69 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Checkout the repository
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # 2. Set up Node.js
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18' # Discord.js v14 recommande Node.js 16.9 ou supérieur
+
+      # 3. Install dependencies with pnpm
+      - name: Install dependencies
+        run: |
+          corepack enable
+          pnpm install
+
+      # 4. Lint the code
+      - name: Lint code
+        run: pnpm lint
+
+      # 5. Build the TypeScript project
+      - name: Build TypeScript
+        run: pnpm build
+
+      # 6. Run tests (if any)
+      - name: Run tests
+        run: pnpm test
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.ref == 'refs/heads/main' # Exécute le déploiement seulement sur la branche principale
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: |
+          corepack enable
+          pnpm install
+
+      - name: Build TypeScript
+        run: pnpm build
+
+      - name: Deploy to Production
+        env:
+          DISCORD_TOKEN: ${{ secrets.DISCORD_TOKEN }}
+          USE_SQL: 'false'
+        run: |
+          pnpm start:prod
