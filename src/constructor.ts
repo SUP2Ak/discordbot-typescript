@@ -68,7 +68,7 @@ export class Client extends DiscordClient {
      * @param {string} filePath - The path to the file
      * @returns {Promise<any>} The imported file
      */
-    async importFile(filePath: string) {
+    private async importFile(filePath: string) {
         // console.log(filePath, 'relative path');
         const fullPath = `.\\${filePath}`; //path.join(__dirname, filePath); // Construit le chemin complet
         // console.log(`Trying to import file: ${fullPath}`);
@@ -80,7 +80,7 @@ export class Client extends DiscordClient {
      * @param {ApplicationCommandDataResolvable[]} commands - The commands to register
      * @param {string} [guildId] - The guild ID to register the commands to
      */
-    async registerCommands({ commands, guildId }: RegisterCommandsOptions) {
+    private async registerCommands({ commands, guildId }: RegisterCommandsOptions) {
         // console.log('Registering commands...');
         if (guildId) {
             this.guilds.cache.get(guildId)?.commands.set(commands);
@@ -92,7 +92,7 @@ export class Client extends DiscordClient {
     };
 
     // Register Modules
-    async registerModules() {
+    private async registerModules() {
         // Register Slash Commands
         const slashCommands: ApplicationCommandDataResolvable[] = [];
         // console.log('Registering commands...');
