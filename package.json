@@ -6,7 +6,7 @@
   "description": "Bot Discord TypeScript Template with MySQL",
   "main": "index.js",
   "scripts": {
-    "lint": "eslint . --ext .ts",
+    "lint": "eslint .",
     "test": "jest",
     "clean": "rimraf dist",
     "start": "ts-node src/index.ts",
