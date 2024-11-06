@@ -10,22 +10,21 @@ import path from "path";
 
 let mysql: any;
 async function initMySQL() {
-    mysql = await import('mysql2');
-    const { Pool, PoolOptions } = mysql as typeof mysql;
+    mysql = await import("mysql2");
     return mysql.createPool({
         host: process.env.SQL_HOST,
         user: process.env.SQL_USER,
         database: process.env.SQL_DATABASE,
         password: process.env.SQL_PASSWORD,
-        port: parseInt(process.env.SQL_PORT || '3306'),
-    } as typeof PoolOptions) as typeof Pool;
+        port: parseInt(process.env.SQL_PORT || "3306"),
+    });
 }
 
 /**
  * @extends ClientEvents
  */
 export class Event<K extends keyof ClientEvents> {
-    constructor(public name: K, public run: (...args: ClientEvents[K]) => any) { };
+    constructor(public name: K, public run: (...args: ClientEvents[K]) => any) { }; // eslint-disable-line no-unused-vars
 };
 
 /**
@@ -52,11 +51,11 @@ export class Client extends DiscordClient {
     start() {
         this.registerModules();
         this.login(process.env.DISCORD_TOKEN).then(async () => {
-            if (process.env.USE_SQL !== 'true') return;
+            if (process.env.USE_SQL !== "true") return;
             this.sql = await initMySQL();
-            this.sql?.query('SELECT DATABASE()', (err: Error, rows: Array<{ 'DATABASE()': string }>) => {
+            this.sql?.query("SELECT DATABASE()", (err: Error, rows: Array<{ "DATABASE()": string }>) => {
                 if (err) throw err;
-                console.log(rows, 'MySQL initialized!');
+                console.log(rows, "MySQL initialized!");
             });
         }).catch((err) => {
             console.error(err);
@@ -124,8 +123,8 @@ export class Client extends DiscordClient {
         const eventFiles = await glob(`${__dirname}/events/**/*.{ts,js}`) as string[];
         eventFiles.map(async (filePath: string) => {
             const event: Event<keyof ClientEvents> = await this.importFile(path.relative(__dirname, filePath));
-            if (!event.name || typeof event.run !== 'function') {
-                console.warn(`${!event.name ? 'This event has no name' : 'This event has no run function, type was ['} ${typeof event.run}] in ${filePath}!`);
+            if (!event.name || typeof event.run !== "function") {
+                console.warn(`${!event.name ? "This event has no name" : "This event has no run function, type was ["} ${typeof event.run}] in ${filePath}!`);
             } else {
                 // console.log(`Event: ${event.name} was successfully imported.`);
                 this.on(event.name, event.run);

@@ -19,5 +19,5 @@ export interface RegisterCommandsOptions {
 
 export type CommandType = {
     userPermissions?: PermissionResolvable[];
-    run: (options: { client: Client, interaction: Interaction, args: CommandInteractionOptionResolver }) => any;
+    run: (options: { client: Client, interaction: Interaction, args: CommandInteractionOptionResolver }) => any; // eslint-disable-line no-unused-vars
 } & ChatInputApplicationCommandData;

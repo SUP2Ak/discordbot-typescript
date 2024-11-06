@@ -5,7 +5,7 @@ import { Interaction } from "../typings";
 
 export default new Event("interactionCreate", async (interaction: any) => {
     if (interaction.isCommand()) {
-        console.log('Command interaction detected!');
+        console.log("Command interaction detected!");
         await interaction.deferReply();
         const command = client.commands.get(interaction.commandName);
         if (!command) return interaction.followUp("Command not found!");
