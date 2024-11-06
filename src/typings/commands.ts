@@ -6,7 +6,7 @@ import {
     GuildMember,
     PermissionResolvable
 } from "discord.js";
-import { Client } from "@/constructor";
+import { Client } from "../constructor";
 
 export interface Interaction extends CommandInteraction {
     member: GuildMember;
