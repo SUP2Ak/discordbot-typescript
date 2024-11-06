@@ -8,6 +8,19 @@ import { RegisterCommandsOptions, CommandType } from "@/typings";
 import { glob } from "glob";
 import path from "path";
 
+let mysql: any;
+async function initMySQL() {
+    mysql = await import('mysql2');
+    const { Pool, PoolOptions } = mysql as typeof mysql;
+    return mysql.createPool({
+        host: process.env.SQL_HOST,
+        user: process.env.SQL_USER,
+        database: process.env.SQL_DATABASE,
+        password: process.env.SQL_PASSWORD,
+        port: parseInt(process.env.SQL_PORT || '3306'),
+    } as typeof PoolOptions) as typeof Pool;
+}
+
 /**
  * @extends ClientEvents
  */
@@ -28,19 +41,26 @@ export class Command {
  * @extends DiscordClient
  */
 export class Client extends DiscordClient {
-    commands: Collection<string, CommandType> = new Collection();
+    public commands: Collection<string, CommandType> = new Collection();
+    public sql: any;
 
     constructor() {
         super({ intents: 1 });
-        console.log('Client created!');
+        // console.log('Client created!');
     };
 
     start() {
         this.registerModules();
-        this.login(process.env.DISCORD_TOKEN).then(() => {
-            console.log('Bot logged in!');
+        this.login(process.env.DISCORD_TOKEN).then(async () => {
+            if (process.env.USE_SQL !== 'true') return;
+            this.sql = await initMySQL();
+            this.sql?.query('SELECT DATABASE()', (err: Error, rows: Array<{ 'DATABASE()': string }>) => {
+                if (err) throw err;
+                console.log(rows, 'MySQL initialized!');
+            });
         }).catch((err) => {
             console.error(err);
+            throw err;
         });
     };
 
@@ -50,9 +70,9 @@ export class Client extends DiscordClient {
      * @returns {Promise<any>} The imported file
      */
     async importFile(filePath: string) {
-        console.log(filePath, 'relative path');
+        // console.log(filePath, 'relative path');
         const fullPath = `.\\${filePath}`; //path.join(__dirname, filePath); // Construit le chemin complet
-        console.log(`Trying to import file: ${fullPath}`);
+        // console.log(`Trying to import file: ${fullPath}`);
         return (await import(fullPath))?.default;
     }
 
@@ -62,7 +82,7 @@ export class Client extends DiscordClient {
      * @param {string} [guildId] - The guild ID to register the commands to
      */
     async registerCommands({ commands, guildId }: RegisterCommandsOptions) {
-        console.log('Registering commands...');
+        // console.log('Registering commands...');
         if (guildId) {
             this.guilds.cache.get(guildId)?.commands.set(commands);
             console.log(`Registered ${commands.length} commands to the guild ${guildId}.`);
@@ -72,33 +92,32 @@ export class Client extends DiscordClient {
         };
     };
 
-    /**
-     * Register modules to the bot
-     */
+    // Register Modules
     async registerModules() {
+        // Register Slash Commands
         const slashCommands: ApplicationCommandDataResolvable[] = [];
-        console.log('Registering commands...');
+        // console.log('Registering commands...');
         const commandFiles = await glob(`${__dirname}/commands/*/*{.ts,.js}`) as string[];
-        console.log(commandFiles)
+        // console.log(commandFiles)
         commandFiles.map(async (filePath: string) => {
             const command = await this.importFile(path.relative(__dirname, filePath)); // Utilisez le chemin relatif
-            console.log(command.name, 'asd');
             if (!command.name) {
                 console.warn(`This command has no name: ${filePath}!`);
             } else {
-                console.log(`Command: ${command.name} was successfully imported.`);
+                // console.log(`Command: ${command.name} was successfully imported.`);
                 this.commands.set(command.name, command);
                 slashCommands.push(command);
             }
         });
 
+        // Register commands on ready
         this.on("ready", () => {
-            console.log('Bot is ready!');
+            // console.log('Bot is ready!');
             this.registerCommands({
                 commands: slashCommands,
                 guildId: process.env.DISCORD_GUILD_ID
             });
-            console.log('Commands registered!');
+            // console.log('Commands registered!');
         });
 
         // Register events
@@ -108,7 +127,7 @@ export class Client extends DiscordClient {
             if (!event.name || typeof event.run !== 'function') {
                 console.warn(`${!event.name ? 'This event has no name' : 'This event has no run function, type was ['} ${typeof event.run}] in ${filePath}!`);
             } else {
-                console.log(`Event: ${event.name} was successfully imported.`);
+                // console.log(`Event: ${event.name} was successfully imported.`);
                 this.on(event.name, event.run);
             };
         });
