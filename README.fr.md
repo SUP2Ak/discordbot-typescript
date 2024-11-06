@@ -11,7 +11,7 @@ Pour commencer avec ce projet, suivez ces étapes :
 1. **Clonez le dépôt :**
 
    ```bash
-   git clone https://github.com/votre_nom_utilisateur/discordbot-typescript.git
+   git clone https://github.com/SUP2Ak/discordbot-typescript.git
    cd discordbot-typescript
    ```
 2. **Installez les dépendances avec pnpm :**

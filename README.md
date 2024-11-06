@@ -9,7 +9,7 @@ To get started with this project, follow these steps:
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/yourusername/discordbot-typescript.git
+   git clone https://github.com/SUP2Ak/discordbot-typescript.git
    cd discordbot-typescript
    ```
 
